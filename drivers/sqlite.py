@@ -12,11 +12,11 @@ class Driver:
 
     def create_table(self, name: str):
         name = sanitize(name)
-        self.dbc.execute(f"CREATE TABLE IF NOT EXISTS {name}(pool TEXT, name TEXT, value TEXT)")
+        self.dbc.execute(f"CREATE TABLE {name}(pool TEXT, name TEXT, value TEXT)")
 
     def delete_table(self, name: str):
         name = sanitize(name)
-        self.dbc.execute(f"DROP TABLE IF EXISTS {name}")
+        self.dbc.execute(f"DROP TABLE {name}")
 
     def read(self, table: str, pool: str, name: str):
         table = sanitize(table)

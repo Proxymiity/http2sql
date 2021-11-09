@@ -38,17 +38,14 @@ class Driver:
     def delete_table(self, name: str):
         name = sanitize(name)
         t_path = Path(str(self.absolute_path) + "/" + name)
-        try:
-            shutil.rmtree(str(t_path))
-        except FileNotFoundError:
-            pass
+        shutil.rmtree(str(t_path))
 
     def read(self, table: str, pool: str, name: str):
         table = sanitize(table)
         d_rel = "/" + table + "/" + pool + fe
         d_data = load_file(self.relative_path + d_rel)
         if d_data is None:
-            return None
+            raise FileNotFoundError
         else:
             try:
                 return d_data[name]
@@ -67,7 +64,7 @@ class Driver:
         d_rel = "/" + table + "/" + pool + fe
         d_data = load_file(self.relative_path + d_rel)
         if d_data is None:
-            return
+            raise FileNotFoundError
         d_data.pop(name)
         dataIO.save_json(self.relative_path + d_rel, d_data)
         if d_data == {}:
