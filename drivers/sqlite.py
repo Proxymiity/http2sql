@@ -7,7 +7,7 @@ def sanitize(val):
 
 class Driver:
     def __init__(self, relative_path):
-        self.db = sqlite3.connect(relative_path)
+        self.db = sqlite3.connect(relative_path, check_same_thread=False)
         self.dbc = self.db.cursor()
 
     def create_table(self, name: str):
@@ -39,3 +39,7 @@ class Driver:
         table = sanitize(table)
         self.dbc.execute(f"DELETE FROM {table} WHERE pool=(?) AND name=(?)", (pool, name))
         self.db.commit()
+
+    def close(self):
+        self.dbc.close()
+        self.db.close()

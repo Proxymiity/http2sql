@@ -10,11 +10,14 @@ loaded_profiles = {}
 
 def reload():
     global loaded_profiles
+    for c in loaded_profiles:
+        loaded_profiles[c].close()
     loaded_profiles = {}
     for p in listdir(str(profiles_path)):
         p_path = Path(str(profiles_path) + "/" + p)
         p_cfg = dataIO.load_json(str(p_path))
-        loaded_profiles[p_path.stem] = Database(p_cfg["driver"], p_cfg["driver_config"])
+        loaded_profiles[p_path.stem] = Database(name=p_cfg["friendly_name"], driver=p_cfg["driver"],
+                                                parameters=p_cfg["driver_config"])
 
 
 def create_table(profile, table):

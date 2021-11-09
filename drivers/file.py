@@ -72,3 +72,6 @@ class Driver:
         dataIO.save_json(self.relative_path + d_rel, d_data)
         if d_data == {}:
             os.remove(self.relative_path + d_rel)
+
+    def close(self):
+        pass  # Nothing to close using a file-based DB as FDs are closed after objects are written to disk

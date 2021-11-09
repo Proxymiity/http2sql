@@ -18,7 +18,6 @@ class Driver:
     def create_table(self, name: str):
         self.check()
         name = sanitize(name)
-        print(f"CREATE TABLE IF NOT EXISTS {name}(pool TEXT, name TEXT, value TEXT)")
         self.dbc.execute(f"CREATE TABLE IF NOT EXISTS {name}(pool TEXT, name TEXT, value TEXT)")
 
     def delete_table(self, name: str):
@@ -50,3 +49,7 @@ class Driver:
         self.check()
         table = sanitize(table)
         self.dbc.execute(f"DELETE FROM {table} WHERE pool=%s AND name=%s", (pool, name))
+
+    def close(self):
+        self.dbc.close()
+        self.db.close()
