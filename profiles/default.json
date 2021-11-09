@@ -1,0 +1,9 @@
+{
+  "driver": "filed",
+  "driver_config": {
+    "relative_path": "data/default.data"
+  },
+  "tokens": {
+    "sample_token": ["*"]
+  }
+}
