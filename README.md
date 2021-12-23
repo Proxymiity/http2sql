@@ -1,1 +1,96 @@
 HTTP2SQL
+
+## App config
+````json
+{
+  "root_token": "root"
+}
+````
+``root_token``: Application token to reload profiles
+
+## Sample profile file explained
+````json
+{
+  "friendly_name": "Default Driver",
+  "driver": "file",
+  "driver_config": {
+    "relative_path": "data/default.data"
+  },
+  "tokens": {
+    "sample_token": ["*"]
+  }
+}
+````
+``friendly_name``: Driver Name  
+``driver``: Driver file to load from /drivers  
+``driver_config``: Config kwargs passed to the driver  
+``tokens``: JSON array with the token as a key and a list of authorized tables. * means this user is a profile admin
+
+## Reload profiles
+Endpoint: ``/reload``  
+Method: ``GET``  
+Headers: ``Authorization <bearer>``  
+Reload profiles in the /profiles directory.
+
+## Create table for specified profile
+Endpoint: ``/<profile>/<table>``  
+Method: ``POST``  
+Headers: ``Authorization <bearer>``  
+Create a new table with the associated profile
+
+## Remove table for specified profile
+Endpoint: ``/<profile>/<table>``  
+Method: ``DELETE``  
+Headers: ``Authorization <bearer>``  
+Remove a table from the associated profile (deleting all pool data with it)
+
+## Store a key
+Endpoint: ``/<profile>/<table>/<key>``  
+Method: ``PUT``  
+Headers: ``Authorization <bearer>``  
+Optional headers: ``Pool <pool_name>``  
+Body: ``<key_value>``  
+Store a key in the database
+
+## Get a key
+Endpoint: ``/<profile>/<table>/<key>``  
+Method: ``GET``  
+Headers: ``Authorization <bearer>``  
+Optional headers: ``Pool <pool_name>``  
+Retrieve a key from the database
+
+## Delete a key
+Endpoint: ``/<profile>/<table>/<key>``  
+Method: ``DELETE``  
+Headers: ``Authorization <bearer>``  
+Optional headers: ``Pool <pool_name>``  
+Removes a key from the database
+
+## The "Pool" concept
+Here's a sample diagram that speaks for itself
+````
+root (http2sql application)
+├─  website (profile)
+│   └─ data (table)
+│     ├─ default (pool)
+│     │  ├─ someKey: someValue (key-value pair) /website/data/someKey
+│     │  └─ someKey2: someValue2 (key-value pair)
+│     └─ dev (pool)
+│        ├─ someKey: someOtherValue (key-value pair) /website/data/someKey (Pool: dev)
+│        └─ someKey2: someOtherValue2 (key-value pair)
+└─  discordbot (profile)
+    ├─ server_preferences (table)
+    │ ├─ serverid_123456789 (pool)
+    │ │  ├─ greetings: true (key-value pair): /discordbot/server_preferences/greetings (Pool: serverid_123456789)
+    │ │  └─ automod: false (key-value pair)
+    │ └─ serverid_987654321 (pool)
+    │    ├─ greetings: false (key-value pair) /discordbot/server_preferences/greetings (Pool: serverid_987654321)
+    │    └─ automod: true (key-value pair)
+    └─ server_notifications (table)
+      ├─ serverid_123456789 (pool)
+      │  ├─ admin_infos: false (key-value pair) /discordbot/server_notifications/admin_infos (Pool: serverid_123456789)
+      │  └─ useful_infos: false (key-value pair)
+      └─ serverid_987654321 (pool)
+         ├─ admin_infos: true (key-value pair) /discordbot/server_notifications/admin_infos (Pool: serverid_987654321)
+         └─ useful_infos: true (key-value pair)
+````
