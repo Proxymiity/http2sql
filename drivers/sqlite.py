@@ -2,7 +2,7 @@ import sqlite3
 
 
 def sanitize(val):
-    return "".join(x for x in val if x.isalnum())
+    return "".join(x for x in val if x.isalnum() or x == "_")
 
 
 class Driver:
