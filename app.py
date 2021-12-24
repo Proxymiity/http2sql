@@ -1,6 +1,7 @@
 from flask import Flask
 from utils import auth
 from utils import profile as pp
+from pxyTools import dataIO
 pp.reload()
 
 app = Flask(__name__)
@@ -71,4 +72,6 @@ def reload_profiles():
 
 
 if __name__ == '__main__':
-    app.run(ssl_context="adhoc", port=5050)
+    app_port = dataIO.load_json("config.json")["app_port"]
+    app_ssl = "adhoc" if dataIO.load_json("config.json")["app_fake_ssl"] else None
+    app.run(ssl_context=app_ssl, port=app_port)

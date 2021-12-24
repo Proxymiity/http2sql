@@ -1,3 +1,5 @@
 {
-  "root_token": "root"
+  "root_token": "root",
+  "app_port": 5050,
+  "app_fake_ssl": false
 }

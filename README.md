@@ -3,10 +3,14 @@ HTTP2SQL
 ## App config
 ````json
 {
-  "root_token": "root"
+  "root_token": "root",
+  "app_port": 5050,
+  "app_fake_ssl": false
 }
 ````
 ``root_token``: Application token to reload profiles
+``app_port``: Webserver port
+``app_fake_ssl``: Whether to run the app in "adhoc" SSL (with no certificates). This makes the app available only using HTTPS. Not recommended for "production". 
 
 ## Sample profile file explained
 ````json
