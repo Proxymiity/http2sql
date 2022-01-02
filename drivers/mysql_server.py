@@ -18,7 +18,7 @@ class Driver:
     def create_table(self, name: str):
         self.check()
         name = sanitize(name)
-        self.dbc.execute(f"CREATE TABLE {name}(pool TEXT, name TEXT, value TEXT)")
+        self.dbc.execute(f"CREATE TABLE {name}(pool TEXT, name TEXT, value LONGTEXT)")
 
     def delete_table(self, name: str):
         self.check()
