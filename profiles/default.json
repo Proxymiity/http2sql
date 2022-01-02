@@ -5,6 +5,8 @@
     "relative_path": "data/default.data"
   },
   "tokens": {
-    "sample_token": ["*"]
+    "sample_admin": ["@"],
+    "sample_user": ["*"],
+    "sample_restricted_user": ["table_name"]
   }
 }

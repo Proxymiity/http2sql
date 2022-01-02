@@ -9,7 +9,7 @@ def esc(s):
 
 
 def get_token():
-    return request.headers.get("Authorization", "")
+    return request.headers.get("APIKey", "")
 
 
 def _load_perms(profile):
@@ -21,6 +21,8 @@ def is_authorized(profile, table, token):
     p = _load_perms(profile)
     if token not in p:
         return False
+    if "@" in p[token]:
+        return True
     if "*" in p[token]:
         return True
     if table not in p[token]:
@@ -32,7 +34,7 @@ def is_admin(profile, token):
     p = _load_perms(profile)
     if token not in p:
         return False
-    if "*" in p[token]:
+    if "@" in p[token]:
         return True
     return False
 

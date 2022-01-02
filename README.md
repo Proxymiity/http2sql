@@ -21,37 +21,40 @@ HTTP2SQL
     "relative_path": "data/default.data"
   },
   "tokens": {
-    "sample_token": ["*"]
+    "sample_admin": ["@"],
+    "sample_user": ["*"],
+    "sample_restricted_user": ["table_name"]
   }
 }
 ````
 ``friendly_name``: Driver Name  
 ``driver``: Driver file to load from /drivers  
 ``driver_config``: Config kwargs passed to the driver  
-``tokens``: JSON array with the token as a key and a list of authorized tables. * means this user is a profile admin
+``tokens``: JSON array with the token as a key and a list of authorized tables.  
+            @ means this user is a profile admin, * means the user can edit all tables. (@ > * > table_name > none)
 
 ## Reload profiles
 Endpoint: ``/reload``  
 Method: ``GET``  
-Headers: ``Authorization <bearer>``  
+Headers: ``APIKey <bearer>``  
 Reload profiles in the /profiles directory.
 
 ## Create table for specified profile
 Endpoint: ``/<profile>/<table>``  
 Method: ``POST``  
-Headers: ``Authorization <bearer>``  
+Headers: ``APIKey <bearer>``  
 Create a new table with the associated profile
 
 ## Remove table for specified profile
 Endpoint: ``/<profile>/<table>``  
 Method: ``DELETE``  
-Headers: ``Authorization <bearer>``  
+Headers: ``APIKey <bearer>``  
 Remove a table from the associated profile (deleting all pool data with it)
 
 ## Store a key
 Endpoint: ``/<profile>/<table>/<key>``  
 Method: ``PUT``  
-Headers: ``Authorization <bearer>``  
+Headers: ``APIKey <bearer>``  
 Optional headers: ``Pool <pool_name>``  
 Body: ``<key_value>``  
 Store a key in the database
@@ -59,14 +62,14 @@ Store a key in the database
 ## Get a key
 Endpoint: ``/<profile>/<table>/<key>``  
 Method: ``GET``  
-Headers: ``Authorization <bearer>``  
+Headers: ``APIKey <bearer>``  
 Optional headers: ``Pool <pool_name>``  
 Retrieve a key from the database
 
 ## Delete a key
 Endpoint: ``/<profile>/<table>/<key>``  
 Method: ``DELETE``  
-Headers: ``Authorization <bearer>``  
+Headers: ``APIKey <bearer>``  
 Optional headers: ``Pool <pool_name>``  
 Removes a key from the database
 
