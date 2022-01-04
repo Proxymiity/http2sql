@@ -1,5 +1,9 @@
 HTTP2SQL
 
+## Prerequisites
+- Python 3.9 (using a venv is not required but recommended)
+- ``pip install --upgrade pxyTools flask mysql.connector psycopg2-binary```
+
 ## App config
 ````json
 {
