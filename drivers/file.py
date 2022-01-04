@@ -20,6 +20,11 @@ def load_file(p: str):
         return None
 
 
+def table_exists(to, t: str):
+    if not Path(str(to.absolute_path) + "/" + t).exists():
+        raise FileNotFoundError
+
+
 def sanitize(val):
     return "".join(x for x in val if x.isalnum())
 
@@ -42,10 +47,11 @@ class Driver:
 
     def read(self, table: str, pool: str, name: str):
         table = sanitize(table)
+        table_exists(self, table)
         d_rel = "/" + table + "/" + pool + fe
         d_data = load_file(self.relative_path + d_rel)
         if d_data is None:
-            raise FileNotFoundError
+            return None
         else:
             try:
                 return d_data[name]
@@ -54,6 +60,7 @@ class Driver:
 
     def write(self, table: str, pool: str, name: str, value: str):
         table = sanitize(table)
+        table_exists(self, table)
         d_rel = "/" + table + "/" + pool + fe
         d_data = load_file(self.relative_path + d_rel) or {}
         d_data[name] = value
@@ -61,10 +68,11 @@ class Driver:
 
     def delete(self, table: str, pool: str, name: str):
         table = sanitize(table)
+        table_exists(self, table)
         d_rel = "/" + table + "/" + pool + fe
         d_data = load_file(self.relative_path + d_rel)
         if d_data is None:
-            raise FileNotFoundError
+            return
         d_data.pop(name)
         dataIO.save_json(self.relative_path + d_rel, d_data)
         if d_data == {}:
