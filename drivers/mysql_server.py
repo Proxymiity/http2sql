@@ -6,8 +6,8 @@ def sanitize(val):
 
 
 class Driver:
-    def __init__(self, host, user, password, database):
-        self.db = mysql.connector.connect(host=host, autocommit=True,
+    def __init__(self, host, user, password, database, port=3306):
+        self.db = mysql.connector.connect(host=host, port=port, autocommit=True,
                                           user=user, password=password, database=database)
         self.dbc = self.db.cursor()
 
