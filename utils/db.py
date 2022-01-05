@@ -17,15 +17,15 @@ class Database:
         self.driver.delete_table(name)
 
     def read(self, table: str, pool: str, key: str) -> str:
-        print(f"[db][{self.name}] GET /{table}/{pool}:{key}")
+        print(f"[db][{self.name}] GET /{table}/{key}:{pool}")
         return self.driver.read(table, pool, key)
 
     def write(self, table: str, pool: str, key: str, value: str):
-        print(f"[db][{self.name}] PUT /{table}/{pool}:{key}")
+        print(f"[db][{self.name}] PUT /{table}/{key}:{pool}")
         self.driver.write(table, pool, key, value)
 
     def delete(self, table: str, pool: str, key: str):
-        print(f"[db][{self.name}] DELETE /{table}/{pool}:{key}")
+        print(f"[db][{self.name}] DELETE /{table}/{key}:{pool}")
         self.driver.delete(table, pool, key)
 
     def close(self):

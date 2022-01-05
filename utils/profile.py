@@ -25,7 +25,7 @@ def reload():
 
 
 def create_table(profile, table):
-    if table in FORBIDDEN_NAMES:
+    if table.lower() in FORBIDDEN_NAMES:
         return "400: Unacceptable table name.", 400
     try:
         loaded_profiles[profile].create_table(table)
@@ -38,7 +38,7 @@ def create_table(profile, table):
 
 
 def delete_table(profile, table):
-    if table in FORBIDDEN_NAMES:
+    if table.lower() in FORBIDDEN_NAMES:
         return "400: Unacceptable table name.", 400
     try:
         loaded_profiles[profile].delete_table(table)
