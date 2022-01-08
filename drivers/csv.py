@@ -20,6 +20,8 @@ class Driver:
     def __init__(self, relative_path):
         self.relative_path = relative_path
         self.absolute_path = Path(os.getcwd() + "/" + self.relative_path)
+        print("Warning: This driver is highly dependant on IO throughput.")
+        print("Warning: Performance may be decreased by the number of entries in the pool.")
 
     def create_table(self, name: str):
         init_storage(self.absolute_path)
