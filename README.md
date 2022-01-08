@@ -1,8 +1,12 @@
-HTTP2SQL
+# HTTP2SQL
+A middleware to interface with storage drivers when you don't have any other solution. 
+Or when you're lazy to use a database driver.
+Or both.  
+Works with regular HTTP(s) using GET/POST/PUT/DELETE requests
 
 ## Prerequisites
 - Python 3.9 (using a venv is not required but recommended)
-- ``pip install --upgrade pxyTools flask mysql.connector psycopg2-binary```
+- ``pip install --upgrade pxyTools flask mysql.connector psycopg2-binary`` (last 2 are mandatory even if you don't use these drivers)
 
 ## App config
 ````json
@@ -36,6 +40,21 @@ HTTP2SQL
 ``driver_config``: Config kwargs passed to the driver  
 ``tokens``: JSON array with the token as a key and a list of authorized tables.  
             @ means this user is a profile admin, * means the user can edit all tables. (@ > * > table_name > none)
+
+To get other options for ``driver_config``, please go to the respective driver's code. JSON keys are passed as kwargs to the Driver class.  
+Here's a sample code (from the postgres driver)
+````python
+class Driver:
+    def __init__(self, host, user, password, database, port=5432)
+````
+JSON for this driver would be:
+````json
+"host": "sample_host"
+"user": "sample_user"
+"password": "sample_password"
+"database": "sample_database"
+"port": 5432  # Omittable
+````
 
 ## Reload profiles
 Endpoint: ``/reload``  
