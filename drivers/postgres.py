@@ -10,7 +10,6 @@ class Driver:
         self.db = psycopg2.connect(host=host, port=port,
                                    user=user, password=password, dbname=database)
         self.dbc = self.db.cursor()
-        self.db.autocommit = True
         self._db_args = (host, user, password, database, port)
 
     def check(self):
@@ -18,7 +17,6 @@ class Driver:
             self.db = psycopg2.connect(host=self._db_args[0], port=self._db_args[4], autocommit=True,
                                        user=self._db_args[1], password=self._db_args[2], dbname=self._db_args[3])
             self.dbc = self.db.cursor()
-            self.db.autocommit = True
 
     def create_table(self, name: str):
         self.check()
@@ -47,11 +45,49 @@ class Driver:
             self.dbc.execute(f"INSERT INTO {table}(pool, name, value) VALUES (%s, %s, %s)", (pool, name, value))
         else:
             self.dbc.execute(f"UPDATE {table} SET value = %s WHERE pool = %s AND name = %s", (value, pool, name))
+        self.db.commit()
 
     def delete(self, table: str, pool: str, name: str):
         self.check()
         table = sanitize(table)
         self.dbc.execute(f"DELETE FROM {table} WHERE pool = %s AND name = %s", (pool, name))
+        self.db.commit()
+
+    def multi(self, get: dict, put: dict, delete: dict):
+        resp = {}
+        if get:
+            for t in get:
+                resp[t] = {}
+                for p in get[t]:
+                    resp[t][p] = {}
+                    for k in get[t][p]:
+                        resp[t][p][k] = self.read(t, p, k)
+        if put:
+            pm = {}
+            for t in put:
+                pm[t] = {}
+                for p in put[t]:
+                    pm[t][p] = {}
+                    for k in put[t][p]:
+                        insert = True if self.read(t, p, k) is None else False
+                        pm[t][p][k] = (insert, put[t][p][k])
+            for t in put:
+                for p in put[t]:
+                    for k in put[t][p]:
+                        if pm[t][p][k][0]:
+                            self.dbc.execute(f"INSERT INTO {t}(pool, name, value) "
+                                             f"VALUES (%s, %s, %s)", (p, k, pm[t][p][k][1]))
+                        else:
+                            self.dbc.execute(f"UPDATE {t} SET value = %s "
+                                             f"WHERE pool = %s AND name = %s", (pm[t][p][k][1], p, k))
+        if delete:
+            for t in delete:
+                for p in delete[t]:
+                    for k in delete[t][p]:
+                        self.dbc.execute(f"DELETE FROM {t} WHERE pool=%s AND name=%s", (p, k))
+        if put or delete:
+            self.db.commit()
+        return resp
 
     def close(self):
         self.dbc.close()
