@@ -109,9 +109,20 @@ def multi(profile):
         json_put = {sanitize(x): json_put[x] for x in json_put}
         json_del = json_data.get("delete", {})
         json_del = {sanitize(x): json_del[x] for x in json_del}
-        resp = loaded_profiles[profile].multi(json_get, json_put, json_del, )
+        _multi_null_check(json_put)
+        resp = loaded_profiles[profile].multi(json_get, json_put, json_del)
         if resp:
             return send_json(resp, 200)
         return send_json({}, 204)
     except Exception as e:
-        return f"500: Could not process request. ({e})", 500
+        return f"400: Could not process request. This is likely an error on your side. " \
+               f"Please check your JSON and the database you are reading/writing to. ({e})", 400
+
+
+def _multi_null_check(j):
+    if j:
+        for t in j:
+            for p in j[t]:
+                for k in j[t][p]:
+                    if j[t][p][k] is None:
+                        raise Exception("Trying to write null values.")
