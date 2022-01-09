@@ -3,13 +3,19 @@ from mysql.connector.errors import ProgrammingError
 from psycopg2.errors import UndefinedTable, DuplicateTable
 from utils.db import Database
 from pxyTools import dataIO
-from utils.auth import esc
+from utils.auth import esc, send_json
 from os import listdir, getcwd
 from pathlib import Path
 from flask import request
+from json import loads
+from json.decoder import JSONDecodeError
 FORBIDDEN_NAMES = ["table"]
 profiles_path = Path(getcwd() + "/profiles")
 loaded_profiles = {}
+
+
+def sanitize(val):
+    return "".join(x for x in val if x.isalnum() or x == "_")
 
 
 def reload():
@@ -86,3 +92,26 @@ def delete(profile, table, key):
         return f"500: Could not delete key. ({e})", 500
     else:
         return f"200: Key deleted.", 200
+
+
+def multi(profile):
+    data = request.get_data(False, True)
+    try:
+        json_data = loads(data)
+        if not isinstance(json_data, dict):
+            return f"400: Malformed JSON. (Expected a dictionary)"
+    except JSONDecodeError as e:
+        return f"400: Malformed JSON. ({e})", 400
+    try:
+        json_get = json_data.get("get", {})
+        json_get = {sanitize(x): json_get[x] for x in json_get}
+        json_put = json_data.get("put", {})
+        json_put = {sanitize(x): json_put[x] for x in json_put}
+        json_del = json_data.get("delete", {})
+        json_del = {sanitize(x): json_del[x] for x in json_del}
+        resp = loaded_profiles[profile].multi(json_get, json_put, json_del, )
+        if resp:
+            return send_json(resp, 200)
+        return send_json({}, 204)
+    except Exception as e:
+        return f"500: Could not process request. ({e})", 500

@@ -62,6 +62,17 @@ def delete_key(profile, table, key):
         return "403: Unauthorized", 403
 
 
+@app.route("/<string:profile>/_multi", methods=["POST"])
+def multi(profile):
+    p = auth.esc(profile)
+    if not auth.profile_exists(p):
+        return "404: Profile not found.", 404
+    if auth.is_authorized(p, "*", auth.get_token()):
+        return pp.multi(p)
+    else:
+        return "403: Unauthorized", 403
+
+
 @app.route("/reload", methods=["GET"])
 def reload_profiles():
     if auth.is_root(auth.get_token()):

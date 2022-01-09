@@ -1,11 +1,19 @@
-from flask import request, escape
+from flask import request, escape, Response
 from pxyTools import dataIO
+from json import dumps
 
 
 def esc(s):
     if s is None:
         return None
     return str(escape(s)).strip()
+
+
+def send_json(j, code=200):
+    json = dumps(j, separators=None, indent=None, sort_keys=False)
+    r = Response(json, code)
+    r.headers['Content-Type'] = 'application/json'
+    return r
 
 
 def get_token():

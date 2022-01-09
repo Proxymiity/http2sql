@@ -28,6 +28,10 @@ class Database:
         print(f"[db][{self.name}] DELETE /{table}/{key}:{pool}")
         self.driver.delete(table, pool, key)
 
+    def multi(self, get: dict, put: dict, delete: dict):
+        print(f"[db][{self.name}] MULTI")
+        return self.driver.multi(get, put, delete)
+
     def close(self):
         print(f"[db][{self.name}] Closed Database")
         self.driver.close()
