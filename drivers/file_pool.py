@@ -26,7 +26,7 @@ def table_exists(to, t: str):
 
 
 def sanitize(val):
-    return "".join(x for x in val if x.isalnum())
+    return "".join(x for x in val if x.isalnum() or x == "_")
 
 
 class Driver:
@@ -78,6 +78,47 @@ class Driver:
         dataIO.save_json(self.relative_path + d_rel, d_data)
         if d_data == {}:
             os.remove(self.relative_path + d_rel)
+
+    def multi(self, get: dict, put: dict, delete: dict):
+        resp = {}
+        if get:
+            for t in get:
+                table_exists(self, t)
+                resp[t] = {}
+                for p in get[t]:
+                    d_rel = "/" + t + "/" + p + fe
+                    d_data = load_file(self.relative_path + d_rel)
+                    resp[t][p] = {}
+                    for k in get[t][p]:
+                        if d_data is None:
+                            resp[t][p][k] = None
+                        else:
+                            try:
+                                resp[t][p][k] = d_data[k]
+                            except KeyError:
+                                resp[t][p][k] = None
+        if put:
+            for t in put:
+                table_exists(self, t)
+                for p in put[t]:
+                    d_rel = "/" + t + "/" + p + fe
+                    d_data = load_file(self.relative_path + d_rel) or {}
+                    for k in put[t][p]:
+                        d_data[k] = put[t][p][k]
+                    dataIO.save_json(self.relative_path + d_rel, d_data)
+        if delete:
+            for t in delete:
+                table_exists(self, t)
+                for p in delete[t]:
+                    d_rel = "/" + t + "/" + p + fe
+                    d_data = load_file(self.relative_path + d_rel) or {}
+                    for k in delete[t][p]:
+                        if d_data is not None:
+                            d_data.pop(k)
+                    dataIO.save_json(self.relative_path + d_rel, d_data)
+                    if d_data == {}:
+                        os.remove(self.relative_path + d_rel)
+        return resp
 
     def close(self):
         pass  # Nothing to close using a file-based DB as FDs are closed after objects are written to disk

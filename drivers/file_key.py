@@ -26,7 +26,7 @@ def table_exists(to, t: str):
 
 
 def sanitize(val):
-    return "".join(x for x in val if x.isalnum())
+    return "".join(x for x in val if x.isalnum() or x == "_")
 
 
 class Driver:
@@ -78,6 +78,27 @@ class Driver:
         dataIO.save_json(self.relative_path + d_rel, d_data)
         if d_data == {}:
             os.remove(self.relative_path + d_rel)
+
+    def multi(self, get: dict, put: dict, delete: dict):
+        resp = {}
+        if get:
+            for t in get:
+                resp[t] = {}
+                for p in get[t]:
+                    resp[t][p] = {}
+                    for k in get[t][p]:
+                        resp[t][p][k] = self.read(t, p, k)
+        if put:
+            for t in put:
+                for p in put[t]:
+                    for k in put[t][p]:
+                        self.write(t, p, k, put[t][p][k])
+        if delete:
+            for t in delete:
+                for p in delete[t]:
+                    for k in delete[t][p]:
+                        self.delete(t, p, k)
+        return resp
 
     def close(self):
         pass  # Nothing to close using a file-based DB as FDs are closed after objects are written to disk

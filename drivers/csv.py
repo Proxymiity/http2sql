@@ -13,7 +13,7 @@ def init_storage(p: Path):
 
 
 def sanitize(val):
-    return "".join(x for x in val if x.isalnum())
+    return "".join(x for x in val if x.isalnum() or x == "_")
 
 
 class Driver:
@@ -77,6 +77,63 @@ class Driver:
                     w.writerows(wl)
                     return
             y += 1
+
+    def multi(self, get: dict, put: dict, delete: dict):
+        resp = {}
+        if get:
+            for t in get:
+                t_path = Path(str(self.absolute_path) + "/" + f"{t}.csv")
+                with open(t_path, 'r', newline='') as f:
+                    r = _csv.reader(f, quoting=_csv.QUOTE_MINIMAL)
+                    wl = list(r)
+                    resp[t] = {}
+                    for p in get[t]:
+                        resp[t][p] = {}
+                        for k in get[t][p]:
+                            resp[t][p][k] = None
+                            for line in wl:
+                                if line[0] == p and line[1] == k:
+                                    resp[t][p][k] = line[2]
+                                    break
+        if put:
+            for t in put:
+                t_path = Path(str(self.absolute_path) + "/" + f"{t}.csv")
+                with open(t_path, 'r', newline='') as f:
+                    r = _csv.reader(f, quoting=_csv.QUOTE_MINIMAL)
+                    wl = list(r)
+                with open(t_path, 'w', newline='') as f:
+                    w = _csv.writer(f, quoting=_csv.QUOTE_MINIMAL)
+                    for p in put[t]:
+                        for k in put[t][p]:
+                            y = 0
+                            f = False
+                            for line in wl:
+                                if line[0] == p and line[1] == k:
+                                    wl[y][2] = put[t][p][k]
+                                    f = True
+                                    break
+                                y += 1
+                            if not f:
+                                wl.append([p, k, put[t][p][k]])
+                    w.writerows(wl)
+        if delete:
+            for t in delete:
+                t_path = Path(str(self.absolute_path) + "/" + f"{t}.csv")
+                with open(t_path, 'r', newline='') as f:
+                    r = _csv.reader(f, quoting=_csv.QUOTE_MINIMAL)
+                    wl = list(r)
+                with open(t_path, 'w', newline='') as f:
+                    w = _csv.writer(f, quoting=_csv.QUOTE_MINIMAL)
+                    for p in delete[t]:
+                        for k in delete[t][p]:
+                            y = 0
+                            for line in wl:
+                                if line[0] == p and line[1] == k:
+                                    wl.pop(y)
+                                    break
+                                y += 1
+                    w.writerows(wl)
+        return resp
 
     def close(self):
         pass
