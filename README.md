@@ -59,25 +59,25 @@ JSON for this driver would be:
 ## Reload profiles
 Endpoint: ``/reload``  
 Method: ``GET``  
-Headers: ``APIKey <bearer>``  
+Headers: ``APIKey <rootkey>``  
 Reload profiles in the /profiles directory.
 
 ## Create table for specified profile
 Endpoint: ``/<profile>/<table>``  
 Method: ``POST``  
-Headers: ``APIKey <bearer>``  
+Headers: ``APIKey <apikey>``  
 Create a new table with the associated profile
 
 ## Remove table for specified profile
 Endpoint: ``/<profile>/<table>``  
 Method: ``DELETE``  
-Headers: ``APIKey <bearer>``  
+Headers: ``APIKey <apikey>``  
 Remove a table from the associated profile (deleting all pool data with it)
 
 ## Store a key
 Endpoint: ``/<profile>/<table>/<key>``  
 Method: ``PUT``  
-Headers: ``APIKey <bearer>``  
+Headers: ``APIKey <apikey>``  
 Optional headers: ``Pool <pool_name>``  
 Body: ``<key_value>``  
 Store a key in the database
@@ -85,16 +85,55 @@ Store a key in the database
 ## Get a key
 Endpoint: ``/<profile>/<table>/<key>``  
 Method: ``GET``  
-Headers: ``APIKey <bearer>``  
+Headers: ``APIKey <apikey>``  
 Optional headers: ``Pool <pool_name>``  
 Retrieve a key from the database
 
 ## Delete a key
 Endpoint: ``/<profile>/<table>/<key>``  
 Method: ``DELETE``  
-Headers: ``APIKey <bearer>``  
+Headers: ``APIKey <apikey>``  
 Optional headers: ``Pool <pool_name>``  
 Removes a key from the database
+
+## Multi
+Endpoint: ``/<profile>/_multi``  
+Method: ``POST``  
+Headers: ``APIKey <apikey>``  
+Body: JSON  
+Allows multiple GET, PUT and DELETE operations in a single request  
+The format for this call must follow this JSON pattern:
+````json
+{
+    "get": {
+        "table_name": {
+            "pool_name": ["key_name"],
+            "default": ["default_is_the_default_pool"]
+        }
+    },
+    "put": {
+        "another_table": {
+            "some_pool": {"key1": "modifiedValue1"},
+            "another_pool": {"key2": "modifiedValue2"}
+        }
+    },
+    "delete": {
+        "employees": {
+          "first_name": ["john.doe"],
+          "last_name": ["john.doe"]
+        }
+  }
+}
+````
+Response will be 204 if no content gets fetched, otherwise it will look like this:
+````json
+{
+    "table_name": {
+        "pool_name": {"key_name": "value"},
+        "default": {"default_is_the_default_pool": "that's true"}
+    }
+}
+````
 
 ## The "Pool" concept
 Here's a sample diagram that speaks for itself

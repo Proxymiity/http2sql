@@ -1,6 +1,6 @@
 {
   "friendly_name": "Default Driver",
-  "driver": "file",
+  "driver": "file_key",
   "driver_config": {
     "relative_path": "data/default.data"
   },
