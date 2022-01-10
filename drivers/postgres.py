@@ -14,7 +14,7 @@ class Driver:
 
     def check(self):
         if self.db.closed != 0:
-            self.db = psycopg2.connect(host=self._db_args[0], port=self._db_args[4], autocommit=True,
+            self.db = psycopg2.connect(host=self._db_args[0], port=self._db_args[4],
                                        user=self._db_args[1], password=self._db_args[2], dbname=self._db_args[3])
             self.dbc = self.db.cursor()
 
