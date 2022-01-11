@@ -8,17 +8,46 @@ Works with regular HTTP(s) using GET/POST/PUT/DELETE requests
 - Python 3.9 (using a venv is not required but recommended)
 - ``pip install --upgrade pxyTools flask mysql.connector psycopg2-binary`` (last 2 are mandatory even if you don't use these drivers)
 
+## Deploy
+1. Install uWSGI: `pip install uwsgi`
+2. Use the provided uWSGI sample config
+3. Serve with ``uwsgi /path/to/uwsgi.ini``  
+NOTA: If you plan to serve with flask's internal webserver to serve h2s, please set both uwsgi options in the config to false.
+
+## uWSGI config
+````ini
+[uwsgi]
+socket = 127.0.0.1:5050
+
+; Note: A master process must be enabled for post-fork to work properly.
+processes = 4
+threads = 2
+master = true
+
+chdir = /path/to/your/app
+venv = /path/to/your/app/venv/if/any
+wsgi-file = app.py
+callable = app
+
+; Set to true for true multiprocessing. Please set use_uwsgi_forking to false in the config.json if using multiprocessing.
+lazy-apps = false
+````
+
 ## App config
 ````json
 {
   "root_token": "root",
   "app_port": 5050,
-  "app_fake_ssl": false
+  "app_fake_ssl": false,
+  "use_uwsgi": true,
+  "use_uwsgi_forking": true
 }
 ````
-``root_token``: Application token to reload profiles
-``app_port``: Webserver port
-``app_fake_ssl``: Whether to run the app in "adhoc" SSL (with no certificates). This makes the app available only using HTTPS. Not recommended for "production". 
+``root_token``: Application token to reload profiles  
+``app_port``: Webserver port  
+``app_fake_ssl``: Whether to run the app in "adhoc" SSL (with no certificates). This makes the app available only using HTTPS. Not recommended for "production".  
+``use_uwsgi``: *Whether to broadcast a profile reload signal to all uWSGI forks (WIP: currently not implemented.)*  
+``use_uwsgi_forking``: Whether to load profiles using the `@postfork` decorator (if using pure uWSGI multiprocessing, this isn't required)
 
 ## Sample profile file explained
 ````json
