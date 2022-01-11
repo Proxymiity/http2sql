@@ -60,3 +60,7 @@ def profile_exists(profile):
         return False
     else:
         return True
+
+
+def get_config():
+    return dataIO.load_json("config.json")

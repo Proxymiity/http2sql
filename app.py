@@ -2,7 +2,8 @@ from flask import Flask
 from utils import auth
 from utils import profile as pp
 from pxyTools import dataIO
-pp.reload()
+if auth.get_config()["use_uwsgi_forking"] is False:
+    pp.reload()
 
 app = Flask(__name__)
 
@@ -76,6 +77,8 @@ def multi(profile):
 @app.route("/reload", methods=["GET"])
 def reload_profiles():
     if auth.is_root(auth.get_token()):
+        if auth.get_config()["use_uwsgi"]:  # TODO: Use some kind of broadcast for profile reloading.
+            return "400: Cannot reload profiles when using uWSGI. Please restart the webserver.", 400
         pp.reload()
         return "200: Profiles reloaded", 200
     else:

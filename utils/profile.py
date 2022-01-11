@@ -3,12 +3,13 @@ from mysql.connector.errors import ProgrammingError
 from psycopg2.errors import UndefinedTable, DuplicateTable
 from utils.db import Database
 from pxyTools import dataIO
-from utils.auth import esc, send_json
+from utils.auth import esc, send_json, get_config
 from os import listdir, getcwd
 from pathlib import Path
 from flask import request
 from json import loads
 from json.decoder import JSONDecodeError
+from uwsgidecorators import postfork
 FORBIDDEN_NAMES = ["table"]
 profiles_path = Path(getcwd() + "/profiles")
 loaded_profiles = {}
@@ -16,6 +17,12 @@ loaded_profiles = {}
 
 def sanitize(val):
     return "".join(x for x in val if x.isalnum() or x == "_")
+
+
+@postfork
+def _uwsgi_post_fork():
+    if get_config()["use_uwsgi_forking"] is True:
+        reload()
 
 
 def reload():
