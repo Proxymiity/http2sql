@@ -10,23 +10,27 @@ class Driver:
         self.db = psycopg2.connect(host=host, port=port,
                                    user=user, password=password, dbname=database)
         self.dbc = self.db.cursor()
+        self.db.autocommit = False
         self._db_args = (host, user, password, database, port)
 
     def check(self):
         if self.db.closed != 0:
             self.db = psycopg2.connect(host=self._db_args[0], port=self._db_args[4],
                                        user=self._db_args[1], password=self._db_args[2], dbname=self._db_args[3])
+            self.db.autocommit = False
             self.dbc = self.db.cursor()
 
     def create_table(self, name: str):
         self.check()
         name = sanitize(name)
         self.dbc.execute(f"CREATE TABLE {name}(pool TEXT, name TEXT, value TEXT)")
+        self.db.commit()
 
     def delete_table(self, name: str):
         self.check()
         name = sanitize(name)
         self.dbc.execute(f"DROP TABLE {name}")
+        self.db.commit()
 
     def read(self, table: str, pool: str, name: str):
         self.check()
